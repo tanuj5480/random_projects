@@ -1,6 +1,7 @@
 import numpy as np
 import collections
-
+import time
+import argparse
 
 def read_function():
     unigram_freq = collections.Counter()
@@ -60,12 +61,37 @@ def spell_check(word, unigram_freq):
     
 if __name__ == "__main__":
 
+    # Initialize the parser
+    parser = argparse.ArgumentParser(description="Process a list of words.")
+    parser.add_argument("words", nargs="+", help="A list of words separated by spaces")
+
+    args = parser.parse_args()
+
+    # args.words is automatically a clean Python list
+    print(f"Your words list: {args.words}")
+    word_to_check = args.words
+    
+    # read the static lookup table for correct wordlist
     word_dct=read_function()
-    word_to_check = ['speiling', 'misteke', 'executionw', 'coding', 'chalenges']
     word_pair = []
+
+    # Start the timer
+    start_time = time.perf_counter()
     for elem in word_to_check:
         corr_word = spell_check(elem, word_dct)
         word_pair.append((elem, corr_word))
 
+    # End the timer
+    end_time = time.perf_counter()
+    execution_time = end_time - start_time
+
     print (word_pair)
+    print ('Total execution time (ms):', round(execution_time*1000, 2))
+    print ('avg per word execution time (ms):', round(execution_time*1000/len(word_to_check), 2))
+
+    # OUTPUT
+    # Your words list: ['speiling', 'misteke', 'executionw', 'coding', 'chalenges']
+    # this word is correctly spelled coding
     # [('speiling', 'spelling'), ('misteke', 'mistake'), ('executionw', 'execution'), ('coding', 'coding'), ('chalenges', 'challenges')]
+    # Total execution time (ms): 1.24
+    # avg per word execution time (ms): 0.25
