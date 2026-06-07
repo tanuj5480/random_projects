@@ -68,3 +68,4 @@ if __name__ == "__main__":
         word_pair.append((elem, corr_word))
 
     print (word_pair)
+    # [('speiling', 'spelling'), ('misteke', 'mistake'), ('executionw', 'execution'), ('coding', 'coding'), ('chalenges', 'challenges')]
