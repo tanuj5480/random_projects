@@ -67,6 +67,7 @@ def spell_check(word, unigram_freq):
         for key, val in final_dct.items():
             if k > 0:
                 heapq.heappush(res, (-1*val, key))
+                k-=1
             else:
                 if val > -1*res[0][0]:
                     heapq.heappop(res)
@@ -81,9 +82,11 @@ def spell_check(word, unigram_freq):
 
     # print (leven_dist_dct)
     res2=[]
+    k2=1
     for key, val in leven_dist_dct.items():
-        if k > 0:
+        if k2 > 0:
             heapq.heappush(res2, (-1*val, key))
+            k2-=1
         else:
             if val > -1*res2[0][0]:
                 heapq.heappop(res2)
