@@ -1,6 +1,7 @@
 from pathlib import Path
 import numpy as np
 import collections
+import heapq
 import time
 import argparse
 import Levenshtein
@@ -26,56 +27,73 @@ def spell_check(word, unigram_freq):
         return word
     
     alpha = 'abcdefghijklmnopqrstuvwxyz'
-    
+    word_set = set()
+
     # check elem deletion
-    deleted_word = []
     for i in range(len(word)):
         new_word = word[:i] + word[i+1:]
-        deleted_word.append(new_word)
+        word_set.add(new_word)
 
     # check elem insertion
-    inserted_word = []
     for i in range(len(word)):
         for j in alpha:
             new_word = word[:i] +str(j) + word[i:]
-            inserted_word.append(new_word)
+            word_set.add(new_word)
 
     # check elem transposition
-    transposed_word = []
     for i in range(len(word)-1):
         ch1 = word[i]
         ch2 = word[i+1]
         new_word = word[:i] +str(ch2) + str(ch1) + word[i+2:]
-        transposed_word.append(new_word)
+        word_set.add(new_word)
     
     # check elem replacement
-    replaced_word = []
     for i in range(len(word)):
         for j in alpha:
             new_word = word[:i] +str(j) + word[i+1:]
-            replaced_word.append(new_word)
+            word_set.add(new_word)
     
-    final_word_lst = deleted_word + inserted_word + transposed_word + replaced_word
     final_dct = {}
-    for elem in final_word_lst:
+    for elem in word_set:
         if elem in unigram_freq:
-            final_dct[elem] = unigram_freq[elem]
+            final_dct[elem] = int(unigram_freq[elem])
 
     # return [[key, int(val)] for key, val in sorted(final_dct.items(), key=lambda x: -1*int(x[1]))][:5]
     # check if there are any results to the 1 change lookup
-    res = ''
+    # maintain a heap, so we do not incur the sorting cost incase there are a lot of candidates
+    res = []
+    k=1
     if len(final_dct) > 0:
-        res = [key for key, val in sorted(final_dct.items(), key=lambda x: -1*int(x[1]))][:1][0]
+        for key, val in final_dct.items():
+            if k > 0:
+                heapq.heappush(res, (-1*val, key))
+                k-=1
+            else:
+                if val > -1*res[0][0]:
+                    heapq.heappop(res)
+                    heapq.heappush(res, (-val, key))
+
 
     leven_dist_dct = collections.Counter()
     for key, val in unigram_freq.items():
         dist = Levenshtein.distance(key, word)
         if dist == 2:
-            leven_dist_dct[key] = val
+            leven_dist_dct[key] = int(val)
 
-    res2 = [key for key, val in sorted(leven_dist_dct.items(), key=lambda x: -1*int(x[1]))][:1][0]
-        
-    return res if res != '' else res2
+    # print (leven_dist_dct)
+    res2=[]
+    k2=1
+    for key, val in leven_dist_dct.items():
+        if k2 > 0:
+            heapq.heappush(res2, (-1*val, key))
+            k2-=1
+        else:
+            if val > -1*res2[0][0]:
+                heapq.heappop(res2)
+                heapq.heappush(res2, (-val, key))
+
+
+    return res[0][1] if res else res2[0][1]
 
     
 if __name__ == "__main__":
@@ -104,9 +122,12 @@ if __name__ == "__main__":
     end_time = time.perf_counter()
     execution_time = end_time - start_time
 
+    avg_word_time_ms = round(execution_time*1000/len(word_to_check), 2)
+    words_per_sec = 1000.0/avg_word_time_ms
     print (word_pair)
     print ('Total execution time (ms):', round(execution_time*1000, 2))
-    print ('avg per word execution time (ms):', round(execution_time*1000/len(word_to_check), 2))
+    print ('avg per word execution time (ms):', avg_word_time_ms)
+    print ('words per sec:', words_per_sec)
 
     # OUTPUT
     # Your words list: ['speiling', 'misteke', 'executionw', 'mekanism', 'coding', 'chalenges']
