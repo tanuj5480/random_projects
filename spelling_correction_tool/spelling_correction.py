@@ -1,11 +1,17 @@
+from pathlib import Path
 import numpy as np
 import collections
 import time
 import argparse
+import Levenshtein
 
 def read_function():
     unigram_freq = collections.Counter()
-    with open("data/unigram_freq.csv", "r", encoding="utf-8") as file:
+
+    script_dir = Path(__file__).resolve().parent
+    absolute_file_path = script_dir / "data" / "unigram_freq.csv"
+
+    with open(absolute_file_path, "r", encoding="utf-8") as file:
         lines = file.readlines()
         for row in lines:
             word, cnt = row.split(",")
@@ -56,7 +62,20 @@ def spell_check(word, unigram_freq):
             final_dct[elem] = unigram_freq[elem]
 
     # return [[key, int(val)] for key, val in sorted(final_dct.items(), key=lambda x: -1*int(x[1]))][:5]
-    return [key for key, val in sorted(final_dct.items(), key=lambda x: -1*int(x[1]))][:1][0]
+    # check if there are any results to the 1 change lookup
+    res = ''
+    if len(final_dct) > 0:
+        res = [key for key, val in sorted(final_dct.items(), key=lambda x: -1*int(x[1]))][:1][0]
+
+    leven_dist_dct = collections.Counter()
+    for key, val in unigram_freq.items():
+        dist = Levenshtein.distance(key, word)
+        if dist == 2:
+            leven_dist_dct[key] = val
+
+    res2 = [key for key, val in sorted(leven_dist_dct.items(), key=lambda x: -1*int(x[1]))][:1][0]
+        
+    return res if res != '' else res2
 
     
 if __name__ == "__main__":
