@@ -22,7 +22,7 @@ def read_function():
 def spell_check(word, unigram_freq):
 
     if word in unigram_freq:
-        print ('this word is correctly spelled', str(word))
+        # print ('this word is correctly spelled', str(word))
         return word
     
     alpha = 'abcdefghijklmnopqrstuvwxyz'
@@ -109,8 +109,7 @@ if __name__ == "__main__":
     print ('avg per word execution time (ms):', round(execution_time*1000/len(word_to_check), 2))
 
     # OUTPUT
-    # Your words list: ['speiling', 'misteke', 'executionw', 'coding', 'chalenges']
-    # this word is correctly spelled coding
-    # [('speiling', 'spelling'), ('misteke', 'mistake'), ('executionw', 'execution'), ('coding', 'coding'), ('chalenges', 'challenges')]
-    # Total execution time (ms): 1.24
-    # avg per word execution time (ms): 0.25
+    # Your words list: ['speiling', 'misteke', 'executionw', 'mekanism', 'coding', 'chalenges']
+    # [('speiling', 'spelling'), ('misteke', 'mistake'), ('executionw', 'execution'), ('mekanism', 'mechanism'), ('coding', 'coding'), ('chalenges', 'challenges')]
+    # Total execution time (ms): 588.66
+    # avg per word execution time (ms): 98.11
