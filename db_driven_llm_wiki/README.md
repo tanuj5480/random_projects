@@ -1,7 +1,11 @@
-Building a database driven LLM Wiki
+## Building a database driven LLM Wiki
 
-for local LLM model, install ollama: curl -fsSL https://ollama.com/install.sh | sh
-Sample for testing the wiki creation
+### For local LLM model, install ollama
+```
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+### CLI command for testing the wiki creation
 
 ```
 python src/cli.py create \
