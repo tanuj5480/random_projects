@@ -1,3 +1,4 @@
+from wiki_graph import run_langgraph_pipeline
 import argparse
 from datetime import datetime
 import re
@@ -83,6 +84,7 @@ def main():
     create_parser.add_argument("--tags", "-g", default="")
     create_parser.add_argument("--sources", "-s", default="")
     create_parser.add_argument("--source-file", "-sf", default=None, help="Staging file target processing marker")
+    create_parser.add_argument("--multi-files", "-mf", help="Comma-separated filenames in staging to merge simultaneously")
 
     update_parser = subparsers.add_parser("update", help="Bump modification parameters.")
     update_parser.add_argument("--category", "-c", required=True)
@@ -94,10 +96,15 @@ def main():
     args = parser.parse_args()
 
     if args.command == "create":
-        if args.source_file:
-            assemble_and_save_wiki(args.source_file, args.category, args.title, args.type, args.tags)
+        if args.multi_files:
+            files_to_merge = [f.strip() for f in args.multi_files.split(",")]
+            # Call LangGraph state machine pipeline
+            run_langgraph_pipeline(files_to_merge, args.category, args.title, args.type, args.tags)
+        elif args.source_file:
+            # Also wire single-file calls through LangGraph for unified processing
+            run_langgraph_pipeline([args.source_file], args.category, args.title, args.type, args.tags)
         else:
-            create_wiki_stub(args.category, args.title, args.type, args.tags, args.sources)
+            create_wiki_stub(args.category, args.title, args.type, args.tags, args.sources)    
     elif args.command == "update":
         update_wiki_timestamp(args.category, args.title)
     elif args.command == "list":
