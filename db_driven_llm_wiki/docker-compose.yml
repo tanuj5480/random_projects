@@ -1,0 +1,11 @@
+version: '3.10'
+
+services:
+  oracle-db:
+    image: container-registry.oracle.com/database/free:latest # Replace with your specific oracle image if different
+    container_name: oracle_container
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PWD=${ORACLE_PWD}
+    restart: always
