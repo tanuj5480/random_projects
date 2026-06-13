@@ -98,11 +98,21 @@ def main():
     if args.command == "create":
         if args.multi_files:
             files_to_merge = [f.strip() for f in args.multi_files.split(",")]
-            # Call LangGraph state machine pipeline
-            run_langgraph_pipeline(files_to_merge, args.category, args.title, args.type, args.tags)
+            # FIXED: Explicitly mapping keyword arguments to prevent positional shifting
+            run_langgraph_pipeline(
+                source_files=files_to_merge, 
+                category=args.category, 
+                target_topic=args.title, 
+                tags=args.tags or ""
+            )
         elif args.source_file:
-            # Also wire single-file calls through LangGraph for unified processing
-            run_langgraph_pipeline([args.source_file], args.category, args.title, args.type, args.tags)
+            # FIXED: Unified keyword mapping for single source files as well
+            run_langgraph_pipeline(
+                source_files=[args.source_file], 
+                category=args.category, 
+                target_topic=args.title, 
+                tags=args.tags or ""
+            )
         else:
             create_wiki_stub(args.category, args.title, args.type, args.tags, args.sources)    
     elif args.command == "update":
